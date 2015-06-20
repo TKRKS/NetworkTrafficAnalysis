@@ -1,0 +1,18 @@
+.networkAnalysisContainer {
+    display: flex;
+    flex-direction: row;
+}
+.configPanel {
+    flex: 1;
+    min-width: 200px;
+}
+.networkWindow {
+    min-width: 600px;
+    height: 400px;
+    border: 1px solid lightgray;
+    flex: 3;
+}
+.detailsBox {
+    flex: 1;
+    min-width: 200px;
+}
