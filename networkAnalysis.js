@@ -136,67 +136,86 @@
             totalPackets: 25000000
         }
     };
+	
+	var hops = 3;
+	var selectedNode = "";
 
     //Converts data into a network
     var createData = function (data) {
         var nodes = {};
         var edges = [];
+		var addedNodes = {};
+		addedNodes[selectedNode] = true;
         var hierarchical = true;
         var hostGroup = true;
         var i;
-        for (i = 0; i < data.length; i++) {        
-            var from, to, edgePackets, sourceHost, destHost, sourcePackets, destPackets, item = data[i];
-            if (item.isDownload) {
-                from = item.sourceAddr;
-                sourceHost = item.sourceHost;
-                sourcePackets = item.totalSourcePackets; 
-                to = item.destAddr;
-                destHost = item.destHost;
-                destPackets = item.totalDestPackets;
-            } else {
-                from = item.destAddr;
-                sourceHost = item.destHost;
-                sourcePackets = item.totalDestPackets; 
-                to = item.sourceAddr;
-                destHost = item.sourceHost;
-                destPackets = item.totalSourcePackets;
-            }
-            edgePackets = item.packets;
-            if (nodes[from] && !nodes[from].isClient) {
-                hierarchical = false;
-            }
-            if (nodes[from] && nodes[from].group !== sourceHost) {
-                hostGroup = false;
-                sourceHost = nodes[from].group + '\n' + sourceHost;
-            }
-            nodes[from] = {
-                id: from,
-                isClient: true,
-                label: from + "/" + clientMask,
-                group: sourceHost,
-                value: sourcePackets
-            };
-            if (nodes[to] && nodes[to].isClient) {
-                hierarchical = false;
-            }
-            if (nodes[to] && nodes[to].group !== destHost) {
-                hostGroup = false;
-                destHost = nodes[to].group + '\n' + destHost;
-            }
-            nodes[to] = {
-                id: to,
-                isClient: false,
-                label: to + "/" + serverMask,
-                group: destHost,
-                value: destPackets
-            };
-            edges.push({
-                from: from,
-                to: to,
-                value: edgePackets,
-                title: from + " to " + to + "<br/ >Packets: " + edgePackets
-            });
-        }
+		var hop;
+		for (hop = 0; hop < hops; hop++) {
+			var currentNodes = {};
+			for (var key in addedNodes) {
+				currentNodes[key] = true;
+			}
+			for (i = 0; i < data.length; i++) {        
+				var from, to, edgePackets, sourceHost, destHost, sourcePackets, destPackets, item = data[i];
+				if (item.isDownload) {
+					from = item.sourceAddr;
+					sourceHost = item.sourceHost;
+					sourcePackets = item.totalSourcePackets; 
+					to = item.destAddr;
+					destHost = item.destHost;
+					destPackets = item.totalDestPackets;
+				} else {
+					from = item.destAddr;
+					sourceHost = item.destHost;
+					sourcePackets = item.totalDestPackets; 
+					to = item.sourceAddr;
+					destHost = item.sourceHost;
+					destPackets = item.totalSourcePackets;
+				}
+				edgePackets = item.packets;
+				if (selectedNode === "" || addedNodes[from] || addedNodes[to]) {
+					currentNodes[from] = true;
+					currentNodes[to] = true;
+					if (nodes[from] && !nodes[from].isClient) {
+						hierarchical = false;
+					}
+					if (nodes[from] && nodes[from].group !== sourceHost) {
+						hostGroup = false;
+						sourceHost = nodes[from].group + '\n' + sourceHost;
+					}
+					nodes[from] = {
+						id: from,
+						isClient: true,
+						label: from + "/" + clientMask,
+						group: sourceHost,
+						value: sourcePackets
+					};
+					if (nodes[to] && nodes[to].isClient) {
+						hierarchical = false;
+					}
+					if (nodes[to] && nodes[to].group !== destHost) {
+						hostGroup = false;
+						destHost = nodes[to].group + '\n' + destHost;
+					}
+					nodes[to] = {
+						id: to,
+						isClient: false,
+						label: to + "/" + serverMask,
+						group: destHost,
+						value: destPackets
+					};
+					edges.push({
+						from: from,
+						to: to,
+						value: edgePackets,
+						title: from + " to " + to + "<br/ >Packets: " + edgePackets
+					});
+				}
+			}
+			for (var key in currentNodes) {
+				addedNodes[key] = true;
+			}
+		}
         if (hierarchical) {
             options.layout.hierarchical = hierarchyOption;
         } else {
@@ -270,19 +289,45 @@
     //Create sliders
 
     network.on("selectNode", function (params) {
-        params.event = "[original event]";
+		selectedNode = params.nodes[0];
         displaySelection(params.nodes[0]);
+		network.setData(createData(currentDataset));
     });
+	
+	$("#1Hop").click(function () {
+		hops = 1;
+		console.log("1 Hop");
+		network.setData(createData(currentDataset));
+		$("#hopDropdown").html('1 Hop <span class="caret"></span>');
+	});
+		
+	$("#2Hops").click(function () {
+		hops = 2;
+		console.log("2 Hops");
+		network.setData(createData(currentDataset));
+		$("#hopDropdown").html('2 Hops <span class="caret"></span>');
+	});
+		
+	$("#3Hops").click(function () {
+		hops = 3;
+		console.log("3 Hops");
+		network.setData(createData(currentDataset));
+		$("#hopDropdown").html('3 Hops <span class="caret"></span>');
+	});
 
     $("#2013Dataset").click(function () {
         currentDataset = data2013;
         currentDetails = details2013;
+		selectedNode = "";
         network.setData(createData(currentDataset));
+		$("#datasetDropdown").html('2013 Dataset <span class="caret"></span>');
     });
 
     $("#2014Dataset").click(function () {
         currentDataset = data2014;
         currentDetails = details2014;
+		selectedNode = "";
         network.setData(createData(currentDataset));
+		$("#datasetDropdown").html('2014 Dataset <span class="caret"></span>');
     });
 });

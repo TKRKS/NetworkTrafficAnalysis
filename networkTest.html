@@ -18,11 +18,15 @@
                 Server Subnet Mask:
                 <br/>
                 Hops:
-                <div id="jq-dropdown-1" class="jq-dropdown jq-dropdown-tip">
-                    <ul class="jq-dropdown-menu">
-                        <li>1</li>
-                        <li>2</li>
-                        <li>3</li>
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" 
+					id="hopDropdown" data-toggle="dropdown">
+					3 Hops
+                    <span class="caret"></span></button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="1Hop">1</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="2Hops">2</a></li>
+						<li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="3Hops">3</a></li>
                     </ul>
                 </div>
 		        <br/>
@@ -30,8 +34,11 @@
                 <br/>
                 <div>
                 <div class="dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Dataset Selection
-                    <span class="caret"></span></button>
+                    <button class="btn btn-default dropdown-toggle" type="button" 
+					id="datasetDropdown" data-toggle="dropdown">
+						No Dataset
+						<span class="caret"></span>
+					</button>
                     <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="2013Dataset">2013</a></li>
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="2014Dataset">2014</a></li>
